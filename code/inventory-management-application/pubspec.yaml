@@ -1,0 +1,30 @@
+name: inventory_management_application
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.1.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  http: ^1.1.0
+  web_socket_channel: ^2.0.0
+  flutter_bloc: ^7.0.0
+  rxdart: ^0.27.1
+  nfc_manager: ^3.3.0
+  permission_handler: ^11.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  fonts:
+    - family: 'Staatliches'
+      fonts:
+        - asset: fonts/Staatliches-Regular.ttf
+  uses-material-design: true

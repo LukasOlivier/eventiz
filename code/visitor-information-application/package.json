@@ -1,0 +1,24 @@
+{
+  "name": "visitor-information-application",
+  "version": "1.0.0",
+  "description": "Visitor information application for EventIZ",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "author": "EventIZ",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.eventiz.visitorinformation",
+    "mac": {
+      "category": "com.eventiz.visitorinformation"
+    }
+  }
+}

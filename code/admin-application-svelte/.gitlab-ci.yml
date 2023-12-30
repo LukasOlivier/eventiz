@@ -1,0 +1,19 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  before_script:
+    - chmod 400 $SSH_KEY
+    - apk add --update openssh-client
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY raspberry@141.134.173.203 "
+      shopt -s dotglob && 
+      rm -rf /home/raspberry/eventiz/svelte/* &&
+      cd /home/raspberry/eventiz/svelte &&
+      git clone git@gitlab.ti.howest.be:ti/2023-2024/s5/ccett/projects/group12/code/admin-application-svelte.git ."
+  script:
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY raspberry@141.134.173.203 "
+      cd /home/raspberry/eventiz/svelte &&
+      docker build . --no-cache -t sveltekit-docker:latest &&
+      docker stop sveltekit-docker && docker rm sveltekit-docker &&
+      docker run -d --name sveltekit-docker -p 3000:3000 sveltekit-docker:latest "

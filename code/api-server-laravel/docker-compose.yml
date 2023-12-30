@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+  app:
+    build:
+      args:
+        user: eventiz
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: eventiz
+    container_name: eventiz-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - eventiz
+
+  db:
+    image: mysql:8.0
+    container_name: eventiz-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+    networks:
+      - eventiz
+    ports:
+      - "3306:3306"
+
+  nginx:
+      image: nginx:alpine
+      container_name: eventiz-nginx
+      restart: unless-stopped
+      ports:
+          - 8393:80 #http
+          
+      volumes:
+          - ./:/var/www
+          - ./docker-compose/nginx:/etc/nginx/conf.d/
+      networks:
+          - eventiz
+
+  websocket:
+    image: php:8.1-fpm
+    container_name: eventiz-websocket
+    restart: unless-stopped
+    ports:
+    - 6001:6001 #websocket
+    working_dir: /var/www
+    command: php artisan websockets:serve
+    volumes:
+      - ./:/var/www
+    networks:
+      - eventiz
+
+networks:
+  eventiz:
+    driver: bridge

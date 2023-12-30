@@ -1,0 +1,23 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  before_script:
+    - chmod 400 $SSH_KEY
+    - apk add --update openssh-client
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY raspberry@141.134.173.203 "
+      shopt -s dotglob &&
+      rm -rf /home/raspberry/eventiz/strapi/* &&
+      cd /home/raspberry/eventiz/strapi &&
+      git clone git@gitlab.ti.howest.be:ti/2023-2024/s5/ccett/projects/group12/code/cms-strapi.git . &&
+      cp /home/raspberry/eventiz/vars/.env-strapi /home/raspberry/eventiz/strapi/.env
+      "
+
+  script:
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY raspberry@141.134.173.203 "
+      cd /home/raspberry/eventiz/strapi &&
+      docker stop eventiz-strapi && docker rm eventiz-strapi &&
+      docker build -t eventiz-strapi . && 
+      docker run -p 1337:1337 -d --name eventiz-strapi eventiz-strapi
+      "

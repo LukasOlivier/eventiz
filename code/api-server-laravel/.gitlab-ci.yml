@@ -1,0 +1,21 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  before_script:
+    - chmod 400 $SSH_KEY
+    - apk add --update openssh-client
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY raspberry@141.134.173.203 "
+      shopt -s dotglob &&
+      rm -rf /home/raspberry/eventiz/laravel/* &&
+      cd /home/raspberry/eventiz/laravel &&
+      git clone git@gitlab.ti.howest.be:ti/2023-2024/s5/ccett/projects/group12/code/laravel.git . &&
+      cp /home/raspberry/eventiz/vars/.env /home/raspberry/eventiz/laravel/.env
+      "
+
+  script:
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY raspberry@141.134.173.203 "
+      cd /home/raspberry/eventiz/laravel &&
+      DOCKER_BUILDKIT=0 docker-compose up --build -d &&
+      docker exec eventiz-app sh -c 'composer update --ignore-platform-req=ext-http && php artisan key:generate && php artisan migrate:rollback && php artisan migrate && php artisan db:seed'"

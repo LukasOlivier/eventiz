@@ -1,0 +1,200 @@
+openapi: 3.0.3
+info:
+  title: Emergency API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8393/api
+paths:
+  /emergency:
+    post:
+      tags: 
+      - Emergencies
+      summary: Create an emergency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Emergency'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+  /emergencies:
+    get:
+      tags: 
+      - Emergencies
+      summary: Get a list of emergencies
+      parameters:
+        - name: type
+          in: query
+          description: Filter emergencies by type
+          schema:
+            type: string
+            example: fire
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Emergency'
+  /emergency-types:
+    get:
+      tags: 
+      - Emergencies
+      summary: Get a list of emergency types
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmergencyType'
+  /sensors:
+    get:
+      tags: 
+      - Sensors
+      summary: Get a list of sensors
+      parameters:
+        - name: type
+          in: query
+          description: Filter sensor by type
+          schema:
+            type: string
+            example: temperature
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensor'
+  /sensors/{type}:
+    patch:
+      tags: 
+      - Sensors
+      summary: Update a sensor by type
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+            example: temperature
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          
+  /racks:
+    get:
+      summary: Get Racks
+      parameters:
+        - name: occupied
+          in: query
+          description: Filter racks by occupancy status (true/false)
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+  /racks/occupy:
+    post:
+      summary: Occupy Rack
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OccupyRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rack'
+        '400':
+          description: Bad request
+  /racks/{rack}/free:
+    post:
+      summary: Free Rack
+      parameters:
+        - name: rack
+          in: path
+          required: true
+          description: The ID of the rack to free
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+
+components:
+  schemas:
+    Emergency:
+      type: object
+      properties:
+        type_id:
+            enum:
+            - 1
+            - 2
+            - 3
+            - 4
+        location:
+          type: string
+    EmergencyType:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "VIOLENCE"
+    Sensor:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "temperature"
+        value:
+          type: number
+          example: 23
+    Rack:
+      type: object
+      properties:
+        id:
+          type: integer
+        occupied_by:
+          type: string
+    OccupyRequest:
+      type: object
+      properties:
+        occupied_by:
+          type: string
+          example: "lukas"
+    SensorRequest:
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 23
